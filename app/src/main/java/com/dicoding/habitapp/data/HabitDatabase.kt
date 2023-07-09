@@ -1,6 +1,7 @@
 package com.dicoding.habitapp.data
 
 import android.content.Context
+import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -13,6 +14,9 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 //TODO 3 : Define room database class and prepopulate database using JSON
+@Database(entities = [Habit::class],
+    version = 1,
+    exportSchema = false)
 abstract class HabitDatabase : RoomDatabase() {
 
     abstract fun habitDao(): HabitDao
