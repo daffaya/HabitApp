@@ -46,7 +46,7 @@ class HabitListActivity : AppCompatActivity() {
         initAction()
 
         val factory = ViewModelFactory.getInstance(this)
-        viewModel = ViewModelProvider(this, factory).get(HabitListViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[HabitListViewModel::class.java]
 
         //TODO 7 : Submit pagedList to adapter and add intent to detail
         adapter = HabitAdapter {
