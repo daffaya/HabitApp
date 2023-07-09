@@ -4,7 +4,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 
 object SortUtils {
 
-    fun getSorteredQuery(filter: HabitSortType): SimpleSQLiteQuery {
+    fun getSortedQuery(filter: HabitSortType): SimpleSQLiteQuery {
         val simpleQuery = StringBuilder().append("SELECT * FROM habits ")
         when (filter) {
             HabitSortType.START_TIME -> {
