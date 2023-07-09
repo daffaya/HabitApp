@@ -5,19 +5,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.GridLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
+import com.dicoding.habitapp.setting.SettingsActivity
 import com.dicoding.habitapp.ui.ViewModelFactory
 import com.dicoding.habitapp.ui.add.AddHabitActivity
 import com.dicoding.habitapp.ui.detail.DetailHabitActivity
+import com.dicoding.habitapp.ui.random.RandomHabitActivity
 import com.dicoding.habitapp.utils.Event
 import com.dicoding.habitapp.utils.HABIT_ID
 import com.dicoding.habitapp.utils.HabitSortType
@@ -77,10 +77,18 @@ class HabitListActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.action_filter -> showFilteringPopUpMenu()
+            R.id.action_random ->
+                startActivity(Intent(this, RandomHabitActivity::class.java))
+            R.id.action_settings ->
+                startActivity(Intent(this, SettingsActivity::class.java))
+        }
         return true
     }
 
