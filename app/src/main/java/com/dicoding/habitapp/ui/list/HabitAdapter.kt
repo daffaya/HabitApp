@@ -1,6 +1,5 @@
 package com.dicoding.habitapp.ui.list
 
-import android.provider.DocumentsContract.Root
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
-import com.dicoding.habitapp.ui.random.RandomHabitActivity
 import com.dicoding.habitapp.ui.random.RandomHabitAdapter
 import java.util.*
 

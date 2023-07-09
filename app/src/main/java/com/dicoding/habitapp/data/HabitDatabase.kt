@@ -1,7 +1,6 @@
 package com.dicoding.habitapp.data
 
 import android.content.Context
-import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -14,9 +13,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 //TODO 3 : Define room database class and prepopulate database using JSON
-@Database(entities = [Habit::class],
-    version = 1,
-    exportSchema = false)
 abstract class HabitDatabase : RoomDatabase() {
 
     abstract fun habitDao(): HabitDao
@@ -28,7 +24,9 @@ abstract class HabitDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): HabitDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
+                val instance = buildDatabase(context)
+                INSTANCE = instance
+                instance
             }
         }
 
@@ -38,6 +36,7 @@ abstract class HabitDatabase : RoomDatabase() {
                 HabitDatabase::class.java,
                 "habits.db"
             )
+//                .addMigrations(MIGRATION_1_2)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
@@ -47,6 +46,12 @@ abstract class HabitDatabase : RoomDatabase() {
                 })
                 .build()
         }
+//        this just a note for myself to try using migration method instead of fallbackToDestructiveMigration() so user doesnt need to reinstal the app if the database updated
+//        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+//            override fun migrate(database: SupportSQLiteDatabase) {
+//                // Migration code if any schema changes occur between version 1 and 2
+//            }
+//        }
 
         private fun fillWithStartingData(context: Context, dao: HabitDao) {
             val jsonArray = loadJsonArray(context)

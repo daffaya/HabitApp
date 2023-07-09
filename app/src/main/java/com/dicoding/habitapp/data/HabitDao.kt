@@ -6,6 +6,7 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
 //TODO 2 : Define data access object (DAO)
+@Dao
 interface HabitDao {
     @RawQuery(observedEntities = [Habit::class])
     fun getHabits(query: SupportSQLiteQuery): DataSource.Factory<Int, Habit>

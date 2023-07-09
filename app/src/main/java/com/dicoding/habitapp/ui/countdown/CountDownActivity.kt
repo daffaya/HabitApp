@@ -20,12 +20,16 @@ class CountDownActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.tv_count_down_title).text = habit.title
 
-        val viewModel = ViewModelProvider(this).get(CountDownViewModel::class.java)
+        val viewModel = ViewModelProvider(this)[CountDownViewModel::class.java]
 
         //TODO 10 : Set initial time and observe current time. Update button state when countdown is finished
+        val tvCountDown = findViewById<TextView>(R.id.tv_count_down)
+        viewModel.setInitialTime(habit.minutesFocus)
+        viewModel.currentTimeString.observe(this){
+            tvCountDown.text = it
+        }
 
         //TODO 13 : Start and cancel One Time Request WorkManager to notify when time is up.
-
         findViewById<Button>(R.id.btn_start).setOnClickListener {
 
         }
