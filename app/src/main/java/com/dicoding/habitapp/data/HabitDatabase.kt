@@ -12,6 +12,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.Executors
 
 //TODO 3 : Define room database class and prepopulate database using JSON
 @Database(entities = [Habit::class],
@@ -28,32 +29,31 @@ abstract class HabitDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): HabitDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = buildDatabase(context)
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    HabitDatabase::class.java,
+                    "habits.db"
+                )
+//                    .addMigrations(Migration1To2)
+                    .addCallback(object : Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            Executors.newSingleThreadScheduledExecutor().execute {
+                                fillWithStartingData(context, getInstance(context).habitDao())
+                            }
+                        }
+                    })
+                    .build()
                 INSTANCE = instance
                 instance
             }
         }
-
-        private fun buildDatabase(context: Context): HabitDatabase {
-            return Room.databaseBuilder(
-                context.applicationContext,
-                HabitDatabase::class.java,
-                "habits.db"
-            )
-//                .addMigrations(MIGRATION_1_2)
-                .addCallback(object : Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
-                        val dao = getInstance(context).habitDao()
-                        fillWithStartingData(context, dao)
-                    }
-                })
-                .build()
-        }
 //        this just a note for myself to try using migration method instead of fallbackToDestructiveMigration() so user doesnt need to reinstal the app if the database updated
-//        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+//        class Migration1To2 : Migration(1, 2) {
 //            override fun migrate(database: SupportSQLiteDatabase) {
-//                // Migration code if any schema changes occur between version 1 and 2
+//                // Perform the necessary schema migration operations here
+//                // For example, you can use the `database.execSQL` method to run SQL queries
+//                // to alter the table structure or perform data transformations
 //            }
 //        }
 
