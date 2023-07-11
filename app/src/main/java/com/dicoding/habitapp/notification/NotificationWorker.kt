@@ -3,6 +3,7 @@ package com.dicoding.habitapp.notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -10,7 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.dicoding.habitapp.R
-import com.dicoding.habitapp.ui.add.AddHabitActivity
+import com.dicoding.habitapp.ui.detail.DetailHabitActivity
 import com.dicoding.habitapp.utils.HABIT_ID
 import com.dicoding.habitapp.utils.HABIT_TITLE
 import com.dicoding.habitapp.utils.NOTIFICATION_CHANNEL_ID
@@ -27,29 +28,36 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
         //TODO 12 : If notification preference on, show notification with pending intent
         if (shouldNotify) {
-            val notificationManager =
-                applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            val notificationBuilder =
-                NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID).apply {
-                    setSmallIcon(R.drawable.ic_notifications)
-                    setContentTitle(habitTitle)
-                    setContentText(applicationContext.getString(R.string.notify_content))
-
-                    val intent = Intent(applicationContext, AddHabitActivity::class.java)
-                    setContentIntent(
-                        PendingIntent.getActivity(applicationContext, 0, intent, 0)
-                    )
+            if (habitTitle != null) {
+                val intent = Intent(applicationContext, DetailHabitActivity::class.java)
+                intent.putExtra(HABIT_ID, habitId)
+                val pendingIntent = TaskStackBuilder.create(applicationContext).run {
+                    addNextIntentWithParentStack(intent)
+                    getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
                 }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    NOTIFICATION_CHANNEL_ID,
-                    NOTIF_UNIQUE_WORK,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                notificationManager.createNotificationChannel(channel)
+                val notificationManager = applicationContext
+                    .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notifications)
+                    .setContentTitle(habitTitle)
+                    .setContentText(applicationContext.getString(R.string.notify_content))
+                    .setAutoCancel(true)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(pendingIntent)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(
+                        NOTIFICATION_CHANNEL_ID,
+                        NOTIF_UNIQUE_WORK,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                    builder.setChannelId(NOTIFICATION_CHANNEL_ID)
+                    notificationManager.createNotificationChannel(channel)
+                }
+
+                val notification = builder.build()
+                notificationManager.notify(100, notification)
             }
-            notificationManager.notify(habitId, notificationBuilder.build())
         }
         return Result.success()
     }
